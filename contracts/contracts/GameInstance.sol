@@ -18,6 +18,7 @@ contract GameInstance{
     address public player1;
     address public player2;
     mapField[10][10] public map;
+    bool active;
 
 
     constructor(
@@ -37,6 +38,11 @@ contract GameInstance{
             }
             unchecked { ++i; }
         }
+        active = true;
+    }
+
+    function isActive() view public returns (bool){
+        return active;
     }
 }
 // //STAGES----------------------/
