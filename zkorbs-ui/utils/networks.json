@@ -1,0 +1,53 @@
+{
+  "selectedChain": "1666900000",
+  "31337": {
+    "chainId": "31337",
+    "chainName": "Localhost 8545",
+    "rpcUrls": [
+      "http://localhost:8545"
+    ],
+    "nativeCurrency": {
+      "symbol": "ETH"
+    },
+    "blockExplorerUrls": []
+  },
+  "1666700000": {
+    "chainId": "1666700000",
+    "chainName": "Harmony Testnet Shard 0",
+    "rpcUrls": [
+      "https://api.s0.b.hmny.io"
+    ],
+    "nativeCurrency": {
+      "symbol": "ONE"
+    },
+    "blockExplorerUrls": [
+      "https://explorer.pops.one/"
+    ]
+  },
+  "1666600000": {
+    "chainId": "1666600000",
+    "chainName": "Harmony Mainnet Shard 0",
+    "rpcUrls": [
+      "https://api.harmony.one"
+    ],
+    "nativeCurrency": {
+      "symbol": "ONE"
+    },
+    "blockExplorerUrls": [
+      "https://explorer.harmony.one/"
+    ]
+  },
+  "1666900000": {
+    "chainId": "1666900000",
+    "chainName": "Harmony Devnet Shard 0",
+    "rpcUrls": [
+      "https://api.s0.ps.hmny.io/"
+    ],
+    "nativeCurrency": {
+      "symbol": "ONE"
+    },
+    "blockExplorerUrls": [
+      "https://explorer.ps.hmny.io/"
+    ]
+  }
+}

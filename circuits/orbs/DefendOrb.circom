@@ -1,7 +1,7 @@
 pragma circom 2.0.3;
 
-include "circomlib/poseidon.circom";
-include "circomlib/comparators.circom";
+include "../node_modules/circomlib/circuits/poseidon.circom";
+include "../node_modules/circomlib/circuits/comparators.circom";
 
 template DefendOrb () {
     
@@ -11,20 +11,34 @@ template DefendOrb () {
 
     signal output attackerEnergyLeft;
     signal output defendHashCheck;
+	signal output defenderEnergyLeftH;
+	signal output defenderEIsZero;
 
-    signal isGreater;
-    
+    signal isAttGreater;
+    signal isDefGreater;
+
     component poseidon = Poseidon(2);
     poseidon.inputs[0] <== defendEnergy;
     poseidon.inputs[1] <== salt;
     defendHashCheck <== poseidon.out;
 
-    component greaterThan = GreaterThan(4);
-    greaterThan.in[0] <== defendEnergy;
-    greaterThan.in[1] <== attackEnergy;
-    isGreater <== greaterThan.out;
-    attackerEnergyLeft <== attackEnergy-defendEnergy+2*isGreater*(defendEnergy-attackEnergy);
+    component greaterThan = GreaterThan(7); //max Energy difference 127
+    greaterThan.in[0] <== attackEnergy;
+    greaterThan.in[1] <== defendEnergy;
+    isAttGreater <== greaterThan.out;
+    attackerEnergyLeft <== isAttGreater*(attackEnergy-defendEnergy);
 
-}
+	component invert = IsZero();
+	invert.in <== isAttGreater;
+	isDefGreater <== invert.out;
+    component poseidon2 = Poseidon(2);
+    poseidon2.inputs[0] <== isDefGreater*(defendEnergy-attackEnergy);
+    poseidon2.inputs[1] <== salt;
+	defenderEnergyLeftH <== poseidon2.out;
+	
+	component isZero = IsZero();
+	isZero.in <== isDefGreater*(defendEnergy-attackEnergy);
+	defenderEIsZero <== isZero.out;
+}	
 
 component main { public [ attackEnergy ] } = DefendOrb();

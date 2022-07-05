@@ -1,6 +1,6 @@
 pragma circom 2.0.3;
 
-include "circomlib/poseidon.circom";
+include "../node_modules/circomlib/circuits/poseidon.circom";
 
 template AttackOrb() {
     signal input attackEnergy;
