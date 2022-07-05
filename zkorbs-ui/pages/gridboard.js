@@ -38,8 +38,19 @@ const STAGES = {
 function GridBoard() {
     /* next hooks */
     const router = useRouter(); /* comes from index.js activeGameInstances list or if you create a new instance. */
-    const { gameInstanceAddress } = router.query;
+    const gameInstanceAddress = router.query['gameInstanceAddress'];
 
+    return (
+        <div>
+            {gameInstanceAddress && <PageContent gameInstanceAddress={gameInstanceAddress} />}
+        </div>
+    )
+
+}
+
+export default GridBoard;
+
+const PageContent = ({ gameInstanceAddress }) => {
     /* wagmi hooks*/
     const { activeChain } = useNetwork();
     const { data: dataAccount } = useAccount();
@@ -53,7 +64,7 @@ function GridBoard() {
         contractInterface: InitVerifierAbi.abi,
         signerOrProvider: signer || provider,
     });
-    //console.log(gameInstanceAddress);
+
     const GameInstanceContract = useContract({
         addressOrName: gameInstanceAddress,
         contractInterface: GameInstanceAbi.abi,
@@ -80,13 +91,19 @@ function GridBoard() {
             setGameStage(gameStage);
         }
 
-        fetchGrid();
-        fetchGameStage();
+        if (GameInstanceContract) {
+            fetchGrid();
+            fetchGameStage();
+        };
+
     }, []);
 
     useInterval(async () => {
+        if (!GameInstanceContract) return;
+
         const newGrid /* Array<Array<[number, address]>> */ = await GameInstanceContract.getMap();
         setGrid(newGrid);
+
         const gameStage /* number */ = await GameInstanceContract.getGameStage();
         setGameStage(gameStage);
 
@@ -189,7 +206,11 @@ function GridBoard() {
             if (callData) {
                 const response = await GameInstanceContract.defendOrb(contractAddress.defendVerifierContract, callData.a, callData.b, callData.c, callData.Input);
                 console.log(response);
-                setEnergy(energy - attackEnergy);
+                const newEnergy = energy - attackEnergy;
+                if (newEnergy < 0) {
+                    newEnergy = 0;
+                }
+                setEnergy(newEnergy);
                 console.log(energy);
             }
 
@@ -212,6 +233,7 @@ function GridBoard() {
                 console.log(JSON.stringify(callData.Input));
                 const response = await GameInstanceContract.setOutcome(contractAddress.outcomeVerifierContract, callData.a, callData.b, callData.c, callData.Input);
                 console.log(response);
+                setEnergy(attackerEnergyLeft);
             }
 
         } catch (error) {
@@ -226,13 +248,27 @@ function GridBoard() {
             <div>
                 {grid.map((row, i) => {
                     return (
-                        <div key={i} className="grid grid-cols-10">
+                        <div key={i} className="grid grid-cols-10" style={{ width: 400 }}>
                             {row.map(([fieldType, fieldOwner], j) => {
+
+                                function getBorderColor() {
+                                    if (currentCell.row === i && currentCell.column === j) return "blue";
+                                    return undefined;
+                                }
+
+                                function getBackground() {
+                                    if (fieldOwner === playerAddress) return "green";
+                                    if (fieldOwner !== "0x0000000000000000000000000000000000000000") return "red";
+                                    if (fieldType === 3) return "gray";
+                                    if (fieldType === 1) return "CornflowerBlue";
+                                    return undefined;
+                                }
+
                                 return (
-                                    <div key={`[${i}][${j}]`} onClick={() => setCurrentCell({ column: j, row: i })} className="border-2" style={{
-                                        borderColor: currentCell.row === i && currentCell.column === j ? "blue" : undefined,
-                                        background: fieldOwner === playerAddress ? "green" : fieldOwner === "0x0000000000000000000000000000000000000000" ? undefined : "red",
-                                        background: fieldType === 3 ? "gray" : fieldType === 1 ? "CornflowerBlue" : undefined
+                                    <div key={`[${i}][${j}]`} onClick={() => setCurrentCell({ column: j, row: i })} className="border-2 h-4" style={{
+                                        height: 40, width: 40,
+                                        borderColor: getBorderColor(),
+                                        background: getBackground()
                                     }}>
                                         {fieldType}
                                     </div>
@@ -247,15 +283,22 @@ function GridBoard() {
                 <input className="bg-stone-800 text-teal-300 w-15 py-2 rounded-md" type="number" placeholder="energy" onChange={(e) => setEnergy(Number(e.target.value))} />
                 <button onClick={handleSpawn} className="button bg-green-600 color-white px-2 py-2 rounded-md m-1">Spawn orb</button>
             </div>
-            <div>
-                <button onClick={() => moveOrb(0)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">UP</button>
-                <button onClick={() => moveOrb(1)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">RIGHT </button>
-                <button onClick={() => moveOrb(2)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">DOWN </button>
-                <button onClick={() => moveOrb(3)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">LEFT</button>
+            <div className="grid grid-cols-3" style={{ width: 400 }}>
+                <div />
+                <button onClick={() => moveOrb(0)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">⬆️</button>
+                <div />
+
+                <button onClick={() => moveOrb(3)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">⬅️</button>
+                <div />
+                <button onClick={() => moveOrb(1)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">➡️</button>
+
+                <div />
+                <button onClick={() => moveOrb(2)} className="button bg-blue-500 color-white px-4 py-3 rounded-md m-1">⬇️</button>
+                <div />
             </div>
             <div>
-                <button onClick={() => attackOrb()} className="button bg-red-500 color-white px-4 py-3 rounded-md m-1">attack </button>
-                <button onClick={() => defendOrb()} className="button bg-red-500 color-white px-4 py-3 rounded-md m-1">defend </button>
+                <button onClick={() => attackOrb()} className="button bg-red-500 color-white px-4 py-3 rounded-md m-1">attack</button>
+                <button onClick={() => defendOrb()} className="button bg-red-500 color-white px-4 py-3 rounded-md m-1">defend</button>
                 <button onClick={() => resaltOrb()} className="button bg-red-500 color-white px-4 py-3 rounded-md m-1">endAttack</button>
             </div>
 
@@ -267,5 +310,5 @@ function GridBoard() {
     )
 }
 
-export default GridBoard
+
 
