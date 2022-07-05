@@ -1,7 +1,7 @@
 {
-	"gameFactoryContract": "0x611428478B646DcDe5Ad658Fc64B532b0cd90C42",
-	"initVerifierContract": "0xBF261B208fF064C5cDb19cD50d70cA840125E467",
-	"attackVerifierContract": "0xFFB61b0DFc8080acdEBA87Bd18c895b054012583",
-	"defendVerifierContract": "0x7FE4125197afEcc219E6b6223A0589B82EB2C7D3",
-	"outcomeVerifierContract": "0x69Cc43b9eD15b337E27961739E0735B114aDA168"
+	"gameFactoryContract": "0xFFB61b0DFc8080acdEBA87Bd18c895b054012583",
+	"initVerifierContract": "0x7FE4125197afEcc219E6b6223A0589B82EB2C7D3",
+	"attackVerifierContract": "0x69Cc43b9eD15b337E27961739E0735B114aDA168",
+	"defendVerifierContract": "0x93d978e7E225fa6e4593fC72Ebb8f22263a3f426",
+	"outcomeVerifierContract": "0x9389a2413e880bC56387032eb026F1Dbb5F482A4"
 }
