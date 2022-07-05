@@ -67,8 +67,8 @@ export async function attackerEResaltCallData(attackerEnergyLeft, salt) {
     try {
         dataResult = await exportCallDataGroth16(
             input,
-            "/zkproof/attackerEResalt.wasm",
-            "/zkproof/attackerEResalt_final.zkey"
+            "/zkproof/AttackerEResalt.wasm",
+            "/zkproof/AttackerEResalt_final.zkey"
         );
     } catch (error) {
         console.log(error);
